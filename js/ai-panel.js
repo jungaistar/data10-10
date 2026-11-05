@@ -1,0 +1,130 @@
+/* AI 연결 설정 카드와 「자동 보내기」 버튼 (data09-27 에서 가져옴 — 로컬 LLM 안내만 바꿈)
+   로직(주소 정리·요청 만들기·응답 읽기)은 js/ai-endpoint.js 에 있고, 여기는 화면만 만듭니다. */
+(function () {
+  'use strict';
+  var E = window.AIEndpoint;
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === 'class') el.className = v;
+      else if (k.slice(0, 2) === 'on' && typeof v === 'function') el.addEventListener(k.slice(2), v);
+      else if (v === true) el.setAttribute(k, '');
+      else el.setAttribute(k, v);
+    });
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function add(el, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { add(el, x); }); return; }
+    el.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+  }
+  function fld(label, control, hint) {
+    return h('label', { class: 'field' }, h('span', null, label), control, hint ? h('small', { class: 'hint' }, hint) : null);
+  }
+
+  /* 설정 카드. opts.toast(msg, isError), opts.onChange() */
+  function settingsCard(opts) {
+    opts = opts || {};
+    var cfg = E.load();
+    var preset = h('select', { 'aria-label': '서버 종류' });
+    E.PRESETS.forEach(function (p) { preset.appendChild(h('option', { value: p.id }, p.label)); });
+    var urlIn = h('input', { value: cfg.baseUrl, placeholder: '예: http://localhost:11434/v1', autocomplete: 'off', spellcheck: 'false' });
+    var modelIn = h('input', { value: cfg.model, placeholder: '예: qwen3:8b (서버에 올라간 모델 이름 그대로)', autocomplete: 'off', spellcheck: 'false', list: 'aiModelList' });
+    var modelList = h('datalist', { id: 'aiModelList' });
+    var keyIn = h('input', { type: 'password', value: cfg.apiKey, placeholder: '로컬 LLM 은 보통 비워 둡니다', autocomplete: 'off' });
+    var remember = h('input', { type: 'checkbox' }); remember.checked = cfg.remember;
+    var status = h('div', { class: 'note', 'aria-live': 'polite' });
+    preset.addEventListener('change', function () {
+      var p = E.PRESETS.filter(function (x) { return x.id === preset.value; })[0];
+      if (p && p.baseUrl) urlIn.value = p.baseUrl;
+      if (p && p.id === 'custom') { urlIn.value = ''; urlIn.focus(); }
+    });
+    function read() { return E.cleanConfig({ baseUrl: urlIn.value, model: modelIn.value, apiKey: keyIn.value, remember: remember.checked, temperature: cfg.temperature, timeoutSec: cfg.timeoutSec }); }
+    function show(v) {
+      status.innerHTML = '';
+      v.errors.forEach(function (e) { status.appendChild(h('p', { class: 'alert warn', style: 'margin:6px 0' }, e)); });
+      v.warnings.forEach(function (w) { status.appendChild(h('p', { class: 'alert info', style: 'margin:6px 0' }, w)); });
+    }
+    function saveNow() {
+      var c = read(), v = E.validateConfig(c, location.protocol);
+      show(v);
+      if (v.errors.length && c.baseUrl) { if (opts.toast) opts.toast('설정을 확인해 주세요.', true); return; }
+      E.save(c); cfg = c;
+      if (opts.toast) opts.toast(E.isReady(c) ? '저장했습니다. 「설정한 AI 서버로 보내기」 버튼을 쓸 수 있습니다.' : '주소가 비어 있어 반자동(복사·붙여 넣기)만 씁니다.');
+      if (opts.onChange) opts.onChange();
+    }
+    function testNow() {
+      var c = read(), v = E.validateConfig(c, location.protocol);
+      show(v);
+      if (v.errors.length) return;
+      status.appendChild(h('p', { class: 'note' }, '연결 확인 중…'));
+      E.callChat(c, E.promptMessages('연결 확인입니다. 「확인」이라고만 답해줘.'), { maxTokens: 512 }).then(function (t) {   // 생각하는 모델(Qwen3)은 <think> 에 먼저 글자를 써서 20 이면 답이 잘림
+        status.lastChild.textContent = '연결됨 — 서버 답: ' + t.slice(0, 80);
+      }, function (e) { status.lastChild.textContent = e.message; status.lastChild.className = 'alert warn'; });
+    }
+    /* 모델 목록 불러오기 — 서버에 올라간 정확한 이름 확인(qwen3.8 · qwen3:8b 처럼 표기가 다를 수 있음) */
+    function modelsNow() {
+      var c = read(), v = E.validateConfig(c, location.protocol);
+      var errs = v.errors.filter(function (e) { return e.indexOf('모델') < 0; });
+      if (errs.length) { show({ errors: errs, warnings: [] }); return; }
+      show({ errors: [], warnings: [] });
+      status.appendChild(h('p', { class: 'note' }, '모델 목록을 불러오는 중…'));
+      E.callModels(c).then(function (list) {
+        modelList.innerHTML = ''; list.forEach(function (m) { modelList.appendChild(h('option', { value: m })); });
+        var mm = E.matchModel(c.model, list), line = status.lastChild;
+        if (!list.length) { line.textContent = '서버가 모델 목록을 비워서 보냈습니다. 로컬 LLM 이면 모델을 먼저 받아 두었는지(예: ollama pull qwen3:8b) 확인해 주세요.'; return; }
+        if (mm.exact) line.textContent = '서버 모델 ' + list.length + '개 — 적은 이름(' + c.model + ')이 목록에 있습니다.';
+        else if (mm.suggest) { modelIn.value = mm.suggest; line.textContent = '서버에서는 「' + mm.suggest + '」로 올라가 있어 그 이름으로 바꿔 두었습니다. 「저장」을 눌러 주세요.'; }
+        else line.textContent = '적은 이름(' + (c.model || '빈칸') + ')이 서버 목록에 없습니다. 모델 이름 칸을 눌러 목록에서 골라 주세요: ' + list.slice(0, 8).join(', ') + (list.length > 8 ? ' …' : '');
+      }, function (e) { status.lastChild.textContent = e.message + ' (목록을 막아 둔 서버도 있습니다 — 그때는 이름을 직접 적어 주세요)'; status.lastChild.className = 'alert warn'; });
+    }
+    return h('section', { class: 'card', id: 'aiSettings' }, h('h2', null, 'AI 연결 설정 (선택 — 로컬 LLM · 자동 보내기)'),
+      h('p', { class: 'note' }, '설정하지 않으면 반자동입니다(프롬프트 복사 → 회사가 허용한 AI 에 붙여 넣기 → 답 붙여 넣기). ' +
+        '내 PC 에 Ollama · LM Studio 같은 로컬 LLM 을 띄웠다면 서버 종류에서 고르고 「모델 목록 불러오기」로 모델을 고르세요. 회의 메모가 PC 밖으로 나가지 않습니다. ' +
+        '사내 LLM 이 「OpenAI 호환 API」(주소가 보통 …/v1 로 끝남)를 열어 두었다면 그 주소를 적으면 됩니다. 키는 이 칸에만 적고 코드 · 파일에는 남기지 않습니다.'),
+      h('div', { class: 'form-grid' },
+        fld('서버 종류', preset),
+        fld('AI 서버 주소(Base URL)', urlIn, '…/v1 까지. /chat/completions 는 도구가 붙입니다.'),
+        fld('모델 이름', [modelIn, modelList], '서버에 올라간 이름 그대로(Ollama 예: qwen3:8b · gemma3:12b). 「모델 목록 불러오기」로 고를 수 있습니다.'),
+        fld('키(선택)', keyIn, '비우면 인증 머리글을 보내지 않습니다.')),
+      h('label', { class: 'opt', style: 'margin-top:8px' }, remember, h('span', null, h('span', { class: 't' }, '키를 이 브라우저에 기억(공용 PC 에서는 끄세요)'))),
+      h('ul', { class: 'note' },
+        h('li', null, 'Qwen3 처럼 「생각하는 모드」가 있는 모델은 답 앞에 <think>…</think> 를 붙여 보낼 수 있습니다. 도구가 그 부분을 떼고 답만 씁니다.'),
+        h('li', null, '보내는 곳은 위 주소 하나뿐입니다. 키는 리포·코드에 없고, 「기억」을 끄면 이 창을 닫을 때 사라집니다.'),
+        h('li', null, '브라우저에서 바로 부르므로 서버가 CORS 를 허용해야 합니다. 가장 쉬운 길은 이 도구를 내려받아 index.html 을 더블클릭해 여는 것(file://)입니다 — Ollama 는 그대로 허용하고, LM Studio 는 「Enable CORS」를 켭니다. 온라인 주소(https)에서는 내 PC(localhost) 말고 http 주소를 쓸 수 없습니다.')),
+      h('div', { class: 'btn-row', style: 'margin-top:10px' },
+        h('button', { type: 'button', class: 'btn btn-primary', onclick: saveNow }, '저장'),
+        h('button', { type: 'button', class: 'btn', onclick: testNow }, '연결 확인'),
+        h('button', { type: 'button', class: 'btn', onclick: modelsNow }, '모델 목록 불러오기'),
+        h('span', { class: 'note' }, '현재: ' + E.describe(cfg))),
+      status);
+  }
+
+  /* 「설정한 AI 서버로 보내기」 버튼. getPrompt() → 문자열, onAnswer(text), opts.toast, opts.settingsHref */
+  function sendButton(label, getPrompt, onAnswer, opts) {
+    opts = opts || {};
+    var cfg = E.load();
+    var ready = E.isReady(cfg);
+    var btn = h('button', { type: 'button', class: 'btn', disabled: !ready, title: ready ? E.describe(cfg) : 'AI 연결 설정이 필요합니다' }, label || '설정한 AI 서버로 보내기');
+    btn.addEventListener('click', function () {
+      var c = E.load(), v = E.validateConfig(c, location.protocol);
+      if (v.errors.length) { if (opts.toast) opts.toast(v.errors[0], true); return; }
+      var p = getPrompt(); if (!p) return;
+      var old = btn.textContent; btn.disabled = true; btn.textContent = '보내는 중…';
+      E.callChat(c, E.promptMessages(p, opts.system)).then(function (text) {
+        btn.disabled = false; btn.textContent = old; onAnswer(text);
+      }, function (e) {
+        btn.disabled = false; btn.textContent = old; if (opts.toast) opts.toast(e.message, true);
+      });
+    });
+    var wrap = h('span', { class: 'ai-send' }, btn);
+    if (!ready) add(wrap, h('small', { class: 'note', style: 'margin-left:6px' }, '자동 보내기는 ', opts.settingsHref ? h('a', { href: opts.settingsHref }, 'AI 연결 설정') : 'AI 연결 설정', ' 후에 쓸 수 있습니다.'));
+    return wrap;
+  }
+
+  window.AIPanel = { settingsCard: settingsCard, sendButton: sendButton };
+})();
