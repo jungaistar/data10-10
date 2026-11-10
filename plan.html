@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기획서 — AI 기반 회의록 요약 도우미</title>
+<meta name="robots" content="index,follow">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.plan-figs figure{margin:0 0 22px;} .plan-figs img{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.plan-figs figcaption{font-size:13px;color:var(--sub);text-align:center;margin-top:6px;}
+.plan td{white-space:normal;} .plan td .btn{min-height:36px;white-space:nowrap;}
+h3{font-size:15px;margin:16px 0 6px;} main ul{margin:0 0 10px 20px;}
+:root{--ink:#152232;--sub:#5b6b7b;--line:#d8e0e8;--brand:#154b6e;--bg:#f5f7fa;--container-pad:20px}
+@media (min-width:640px){:root{--container-pad:28px}} @media (min-width:1024px){:root{--container-pad:40px}}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;word-break:keep-all;overflow-wrap:break-word}
+a{color:var(--brand)} .wrap,.topnav-inner{max-width:calc(1100px + 2*var(--container-pad));margin:0 auto;padding:0 var(--container-pad)}
+.topnav{background:#0d3350;color:#fff;position:sticky;top:0;z-index:5} .topnav-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;min-height:56px}
+.topnav-brand{color:#fff;text-decoration:none;font-weight:700} .topnav-brand small{font-weight:400;opacity:.75;margin-left:6px}
+.topnav-links{list-style:none;display:flex;gap:4px;margin:0;padding:0} .topnav-links a{color:#dbe7f0;text-decoration:none;padding:8px 12px;border-radius:8px;display:block} .topnav-links a.active,.topnav-links a:hover{background:rgba(255,255,255,.14);color:#fff}
+.hero{background:linear-gradient(180deg,#154b6e,#0d3350);color:#fff;padding:40px 0 36px} .hero h1{margin:6px 0 10px;font-size:clamp(24px,3.4vw,34px);color:#fff} .hero p{margin:0;opacity:.9;max-width:860px} .eyebrow{font-size:13px;opacity:.8}
+main{padding:28px 0 40px} .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;margin:0 0 20px} .sub{color:var(--sub)}
+.tablewrap{overflow-x:auto} table{border-collapse:collapse;width:100%;font-size:14.5px} th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top} th{background:#eef3f7;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:8px;border:1px solid var(--brand);text-decoration:none;font-weight:600} .btn.primary{background:var(--brand);color:#fff}
+footer{border-top:1px solid var(--line);padding:20px 0 28px;color:var(--sub);font-size:13.5px}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="주요 메뉴">
+  <div class="topnav-inner">
+    <a class="topnav-brand" href="index.html">AI 기반 회의록 요약 도우미 <small>data10-10 · 기획 나선준</small></a>
+    <ul class="topnav-links">
+      <li><a href="index.html">도구</a></li>
+      <li><a href="plan.html" class="active" aria-current="page">기획서</a></li>
+    </ul>
+  </div>
+</nav>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">현장 데이터 디지털화 전문가과정 · 2차수 · 프로젝트 10 · 기획서 v2.1</div>
+  <h1>AI 기반 회의록 요약 도우미 기획서</h1>
+  <p>회의 직후 메모장 · 워드로 적은 메모와 회의록 서식을 넣으면 결정 사항과 Action Item(할 일 · 담당 · 기한)까지 서식 칸에 맞춰 정리하는 브라우저 도구입니다. 반자동 AI · 로컬 LLM · AI 없는 규칙 초안 중 하나로 정리합니다.</p>
+</div></header>
+<main><div class="wrap">
+<div class="card">
+  <h2 style="margin-top:0">기획서 내려받기</h2>
+  <p class="sub">파이프라인 · 아키텍처 · 와이어프레임 · 개발일지가 들어간 워드 문서입니다. 버전마다 따로 남깁니다.</p>
+  <div class="tablewrap plan"><table><thead><tr><th>버전</th><th>날짜</th><th>바뀐 점</th><th>파일</th></tr></thead><tbody><tr><td><b>v2.1</b></td><td>2026-11-10</td><td>로컬 실행 — HTML 한 파일(dist/data10-10_회의록요약도우미.html, 설치 · exe 없이 더블클릭) · 설정의 「HTML 한 파일로 받기」 / 선택: Non Archive 실행기(tools/local-exe — PyInstaller --onedir --noarchive, 내 PC 127.0.0.1 에서만 열림) / 파일로 열었을 때 사내 AI 서버 CORS(Origin: null) 안내</td><td><a class="btn primary" href="docs/기획서/data10-10_나선준_AI기반회의록요약도우미_기획서_v2.1.docx" download>워드 내려받기</a></td></tr><tr><td><b>v2.0</b></td><td>2026-11-10</td><td>최종 기획서 — 파이프라인 · 아키텍처 · 와이어프레임 정리 / 로그인 · 사용 신청 · 관리자 승인(요청자 Supabase 로 옮길 수 있게) / 로그인 전 대문</td><td><a class="btn primary" href="docs/기획서/data10-10_나선준_AI기반회의록요약도우미_기획서_v2.0.docx" download>워드 내려받기</a></td></tr></tbody></table></div>
+</div>
+<div class="card plan">
+  <h2 style="margin-top:0">요구사항과 구현</h2>
+  <div class="tablewrap"><table><thead><tr><th>기획서 요구</th><th>구현</th></tr></thead><tbody><tr><td>메모장 · 워드로 작성된 회의 내용 넣기</td><td>붙여 넣기 · .txt(UTF-8 · 메모장 ANSI) · .docx(표는 한 행을 한 줄로). 옛 .doc · .hwp 는 2단계</td></tr><tr><td>회의록 서식을 같이 넣기</td><td>기본 서식 3종 + 워드 양식(.docx) · 양식 글에서 칸 뽑기, 칸마다 역할(결정 · Action Item · 다음 회의 …)</td></tr><tr><td>서식에 맞춰 주요 내용 정리</td><td>반자동 프롬프트 · 답 읽기(JSON · 칸 이름 묶음 · 표) · 규칙 초안, 메모 근거 점검. 실제 정답 견본과 맞추기는 2단계</td></tr><tr><td>필요 시 로컬 LLM 활용</td><td>OpenAI 호환 주소로 Ollama · LM Studio · 사내 LLM 서버, 모델 목록 불러오기, &lt;think&gt; 떼기</td></tr><tr><td>결정 · 담당 · 기한 챙기기</td><td>Action Item 모아 보기 — 기한 지남 · 3일 안 · 담당자별, 완료 체크</td></tr><tr><td>회의 녹음 → 글 · 팀 공유 · 알림</td><td>3단계 — 범위 확정 후</td></tr><tr><td>사내 보안으로 웹 주소가 막힐 때 로컬 PC 에서 실행(exe · Non Archive)</td><td>HTML 한 파일(설치 · exe 없음, 더블클릭) 권장 · 선택으로 PyInstaller --onedir --noarchive 실행기 만드는 순서(tools/local-exe)</td></tr></tbody></table></div>
+</div>
+<div class="card plan-figs"><h2 style="margin-top:0">그림으로 보기</h2><figure><img src="docs/img/pipeline.png" alt="처리 흐름(파이프라인)" loading="lazy"><figcaption>처리 흐름(파이프라인)</figcaption></figure><figure><img src="docs/img/architecture.png" alt="구성(아키텍처)" loading="lazy"><figcaption>구성(아키텍처)</figcaption></figure><figure><img src="docs/img/wireframe-1.png" alt="와이어프레임 — 로그인 전 대문" loading="lazy"><figcaption>와이어프레임 — 로그인 전 대문</figcaption></figure><figure><img src="docs/img/wireframe-2.png" alt="와이어프레임 — 01 메모 → 회의록" loading="lazy"><figcaption>와이어프레임 — 01 메모 → 회의록</figcaption></figure><figure><img src="docs/img/wireframe-3.png" alt="와이어프레임 — 회의록 편집 · Action Item" loading="lazy"><figcaption>와이어프레임 — 회의록 편집 · Action Item</figcaption></figure><figure><img src="docs/img/wireframe-4.png" alt="와이어프레임 — 05 설정 — 로컬 실행" loading="lazy"><figcaption>와이어프레임 — 05 설정 — 로컬 실행</figcaption></figure><figure><img src="docs/img/screen.png" alt="실제 화면(예제 데이터)" loading="lazy"><figcaption>실제 화면(예제 데이터)</figcaption></figure></div>
+<div class="card"><h2 style="margin-top:0">개발일지</h2><h3>2026-11-10 · v2.1 로컬 실행</h3><ul><li>요청: 회사 보안으로 웹이 막힐 수 있어 로컬 PC 에서 exe(Non Archive)로 실행</li><li>HTML 한 파일(dist) — index.html · css · js · vendor 를 한 파일로, 판을 올리면 함께 다시 만듦, file:// 에서는 로그인 · fresh-guard 생략</li><li>선택: tools/local-exe — run_local.py(표준 라이브러리, 127.0.0.1) · build_exe.bat(--onedir --noarchive) · README. Windows exe 는 Windows 에서 만들어야 함</li><li>로직 테스트 26개 · AI 연결 14개, 화면 점검 폴더 99 · 한 파일 105 · 127.0.0.1 99(1280 · 390 · 360px)</li></ul><h3>2026-11-10 · 최종 기획서 · 로그인</h3><ul><li>로그인 · 사용 신청 · 관리자 승인 적용, 로그인 전 대문</li><li>최종 기획서 v2.0(파이프라인 · 아키텍처 · 와이어프레임), README 정리</li><li>로직 테스트 25개 · AI 연결 테스트 13개 통과</li></ul><h3>2026-11-08 · 새 주소</h3><ul><li>옛 깃허브 Pages 주소에서 jobability.co.kr 새 주소로 옮김</li></ul><h3>2026-10-27 · 판 맞추기</h3><ul><li>index.html 의 모든 js·css 에 ?v=판, fresh-guard, 판이 다르면 계산하지 않고 새로고침 안내</li></ul><h3>2026-10-26 · 비공개 전환</h3><ul><li>리포를 비공개로 바꾸고 README 의 Fork·ZIP 안내를 문의 안내로 교체</li></ul><h3>2026-10-20 · 기획서 v0.1 + 1단계</h3><ul><li>패들릿 제출 글을 기획서로 정리, 화면 6개 + 편집 화면 구현</li><li>세 가지 정리 방법을 나란히(반자동 · 로컬 LLM · 규칙 초안), 칸 역할, 너그러운 AI 답 읽기, 메모 근거 점검</li><li>로직 테스트 24개 · AI 연결 13개, 브라우저 점검 1280 · 390px 60개</li></ul></div>
+</div></main>
+<footer><div class="wrap">현장 데이터 디지털화 전문가과정 · 2차수 · 프로젝트 10 · 기획 나선준 · <a href="https://data10-00.jobability.co.kr/">2차수 프로젝트 모음</a></div></footer>
+</body>
+</html>

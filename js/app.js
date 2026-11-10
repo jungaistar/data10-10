@@ -6,7 +6,7 @@
   var L = window.MinutesLogic, SM = window.MinutesSamples, AIP = window.AIPanel, AIE = window.AIEndpoint;
   /* 판 맞추기 — 브라우저가 옛 logic.js 와 새 app.js 를 섞어 쓰면(Pages 캐시) 버튼과 결과가 어긋날 수 있어, 섞였으면 계산하지 않고 새로고침을 안내합니다.
      판은 scripts/bump-version.mjs 로 index.html(?v=) · logic.js 와 함께 올립니다. */
-  var APP_VERSION = '2026-10-27.1';
+  var APP_VERSION = '2026-11-10.2';
   if (!L || L.VERSION !== APP_VERSION) {
     var m0 = document.getElementById('main') || document.body;
     m0.innerHTML = '<section class="card" id="versionMismatch"><h1>새 판이 나왔습니다 — 새로고침(Ctrl+F5)해 주세요</h1><p class="alert warn">이 브라우저가 옛 파일과 새 파일을 섞어 불러왔습니다(js/logic.js ' +
@@ -14,7 +14,14 @@
       '<p>Windows 는 <b>Ctrl+F5</b>, Mac 은 <b>Cmd+Shift+R</b> 을 한 번 눌러 주세요. 쌓아 둔 자료는 지워지지 않습니다.</p></section>';
     return;
   }
-  (function () { var ft = document.querySelector('.site-footer .inner') || document.querySelector('.site-footer'); if (!ft) return; var s = document.createElement('span'); s.className = 'ver'; s.textContent = ' · 판 ' + APP_VERSION; ft.appendChild(s); })();
+  var SINGLE = !!window.__SINGLE_FILE__;   // scripts/build-single.mjs 가 만든 「HTML 한 파일」 판이면 true
+  var SINGLE_NAME = 'data10-10_회의록요약도우미.html';
+  (function () {
+    var ft = document.querySelector('.site-footer .inner') || document.querySelector('.site-footer'); if (!ft) return;
+    var s = document.createElement('span'); s.className = 'ver'; s.textContent = ' · 판 ' + APP_VERSION + (SINGLE ? ' (HTML 한 파일)' : ''); ft.appendChild(s);
+    if (!SINGLE) { ft.appendChild(document.createTextNode(' · ')); var a = document.createElement('a'); a.href = '#/settings'; a.textContent = 'HTML 한 파일로 받기';
+      a.addEventListener('click', function () { setTimeout(function () { var c = document.getElementById('singleCard'); if (c) c.scrollIntoView({ block: 'start' }); }, 50); }); ft.appendChild(a); }
+  })();
   var DB_KEY = 'data10-10.db', DRAFT_KEY = 'data10-10.draft';
   var main = document.getElementById('main');
 
@@ -652,13 +659,14 @@
   /* ── 05 설정 ─────────────────────────────── */
   function viewSettings() {
     main.appendChild(pageHead('05 · 설정', '설정', 'AI 연결(로컬 LLM)은 선택입니다. 설정하지 않아도 반자동과 규칙 초안은 그대로 쓸 수 있습니다.'));
+    main.appendChild(singleFileCard());
     main.appendChild(AIP.settingsCard({ toast: toast, onChange: topbar }));
     main.appendChild(h('section', { class: 'card' }, h('h2', null, '로컬 LLM 준비(내 PC)'),
       h('ol', { class: 'flow' },
         h('li', null, 'Ollama(ollama.com) 또는 LM Studio(lmstudio.ai)를 설치합니다. 회사 PC 라면 설치 가능 여부를 IT 에 먼저 확인해 주세요.'),
         h('li', null, '한국어를 잘 하는 모델을 받습니다. 예) 명령 창에서 ', h('code', null, 'ollama pull qwen3:8b'), ' (PC 메모리 16GB 이상 권장. 8GB 면 더 작은 모델)'),
-        h('li', null, '이 도구를 내려받아 index.html 을 더블클릭해 엽니다(file://). 위 「서버 종류」에서 Ollama 를 고르고 「모델 목록 불러오기」 → 모델 고르기 → 「저장」.'),
-        h('li', null, '「01 메모 → 회의록」의 「설정한 AI 서버로」 탭에서 보내기. LM Studio 는 Developer 화면에서 서버를 켜고 「Enable CORS」를 켭니다.')),
+        h('li', null, '위 「HTML 한 파일로 받기」로 받은 파일을 더블클릭해 엽니다(file://). 위 「서버 종류」에서 Ollama 를 고르고 「모델 목록 불러오기」 → 모델 고르기 → 「저장」.'),
+        h('li', null, '「01 메모 → 회의록」의 「설정한 AI 서버로」 탭에서 보내기. LM Studio 는 Developer 화면에서 서버를 켜고 「Enable CORS」를 켭니다. Ollama 가 연결을 거절하면 환경 변수 OLLAMA_ORIGINS 에 허용할 출처를 넣고 다시 켭니다.')),
       h('p', { class: 'note' }, '로컬 LLM 은 메모가 PC 밖으로 나가지 않지만, 작은 모델은 담당 · 기한을 틀리기 쉽습니다. 편집 화면의 「확인 필요」 표시를 꼭 살펴 주세요.')));
 
     var always = h('textarea', { class: 'input', rows: 3, placeholder: '예) 팀원 이름을 쉼표로' });
@@ -693,6 +701,21 @@
           if (!confirm('서식 · 회의록 · 작성 중 메모를 모두 지울까요? 되돌릴 수 없습니다.')) return;
           db = L.cleanDb(null); draft = emptyDraft(); save(); saveDraft(); render(); toast('모두 지웠습니다.');
         } }, '모두 지우기'))));
+  }
+
+  /* HTML 한 파일 — 회사 보안으로 웹 주소가 막힐 수 있어(2026-11-10 요청) 사내 PC 에 저장해 두고 더블클릭해 씁니다(설치 · exe 없음) */
+  function singleFileCard() {
+    var steps = h('ol', { class: 'flow' },
+      h('li', null, '아래 단추로 ', h('code', null, SINGLE_NAME), ' 한 파일을 받아 PC 의 알맞은 폴더(예: 문서\\회의록)에 둡니다. 인터넷이 되는 PC 에서 받아 사내 메일 · USB 로 옮겨도 됩니다.'),
+      h('li', null, '파일을 더블클릭하면 브라우저(Edge · Chrome)로 열립니다. 설치 · 실행 파일(exe)이 없고, 로그인 없이 바로 씁니다. 외부 주소를 부르지 않습니다.'),
+      h('li', null, '회의록 · 서식은 그 PC 의 그 브라우저 안에만 저장됩니다. 다른 브라우저로 열면 빈 화면에서 시작하니, PC 를 바꿀 때는 아래 「백업 · 옮기기」의 JSON 으로 옮깁니다.'),
+      h('li', null, '새 판으로 바꿀 때는 새 파일을 같은 이름 · 같은 폴더에 덮어쓰고 다시 엽니다. 같은 브라우저로 열면 쌓아 둔 회의록이 그대로 이어집니다. 바꾸기 전에 JSON 백업을 한 번 받아 두세요.'),
+      h('li', null, 'AI 자동 보내기: 내 PC 의 로컬 LLM(Ollama · LM Studio)은 그대로 쓸 수 있습니다. 사내 AI 서버는 파일에서 오는 요청(Origin: null)을 허용(CORS)해야 하므로, 막히면 반자동(프롬프트 복사 · 붙여 넣기)을 쓰세요.'));
+    return h('section', { class: 'card', id: 'singleCard' }, h('h2', null, 'HTML 한 파일로 쓰기 (내 PC · 설치 없음)'),
+      SINGLE ? h('p', { class: 'alert info' }, '지금 열린 것이 HTML 한 파일 판입니다(판 ' + APP_VERSION + '). 새 판은 인터넷이 되는 PC 에서 이 도구 사이트(처음 이 파일을 받은 주소)를 열어 「설정 → HTML 한 파일로 받기」로 받습니다.')
+        : h('div', { class: 'btn-row' }, h('a', { class: 'btn btn-primary', id: 'singleDownload', href: 'dist/' + SINGLE_NAME, download: SINGLE_NAME }, 'HTML 한 파일로 받기 (판 ' + APP_VERSION + ')')),
+      steps,
+      h('p', { class: 'note' }, '실행 파일(exe)이 꼭 필요하면 리포의 tools/local-exe 에 PyInstaller 「폴더형 · 아카이브 없음(--onedir --noarchive)」으로 만드는 순서가 있습니다. 회사 보안 프로그램에 따라 이것도 막힐 수 있어 HTML 한 파일을 먼저 권합니다.'));
   }
 
   /* ── 길잡이 ───────────────────────────────── */

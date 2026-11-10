@@ -9,6 +9,7 @@
    · 브라우저에서 직접 부르므로 서버가 CORS 를 허용해야 합니다(Ollama 는 file:// 과 localhost 를 기본 허용,
      온라인 주소에서 쓰려면 OLLAMA_ORIGINS 설정 · LM Studio 는 서버 설정의 「Enable CORS」).
      https 페이지에서 http 주소는 브라우저가 막습니다(혼합 콘텐츠). 단 내 PC(localhost · 127.0.0.1)는 크롬 · 엣지가 허용합니다.
+     파일(file://, HTML 한 파일)로 열면 요청의 Origin 이 「null」입니다 — 사내 서버가 이를 허용하지 않으면 CORS 로 막혀 경고를 띄웁니다(2026-11-10).
    · Qwen3 같은 「생각하는 모델」의 <think>…</think> 는 떼고 답만 씁니다(stripThinking).
    반자동(프롬프트 복사 → 붙여 넣기)은 그대로 기본값이고, 이 설정은 「자동 보내기」를 쓸 때만 필요합니다. */
 (function (root, factory) {
@@ -52,9 +53,11 @@
     if (m) {
       var scheme = m[1].toLowerCase(), host = m[2];
       if (scheme === 'http' && pageProtocol === 'https:' && isLoopback(host))
-        warnings.push('온라인 페이지(https)에서 내 PC 의 http 서버로 보냅니다. 크롬 · 엣지는 허용하지만, 서버가 이 주소의 요청을 허용(CORS)해야 합니다 — Ollama 는 OLLAMA_ORIGINS, LM Studio 는 「Enable CORS」. 안 되면 이 도구를 내려받아 index.html 을 더블클릭해 여세요(file://).');
+        warnings.push('온라인 페이지(https)에서 내 PC 의 http 서버로 보냅니다. 크롬 · 엣지는 허용하지만, 서버가 이 주소의 요청을 허용(CORS)해야 합니다 — Ollama 는 OLLAMA_ORIGINS, LM Studio 는 「Enable CORS」. 안 되면 「설정 → HTML 한 파일로 받기」로 받은 파일을 더블클릭해 여세요(file://).');
       else if (scheme === 'http' && pageProtocol === 'https:')
         errors.push('이 페이지는 https 라서 http 주소로는 보낼 수 없습니다(브라우저가 막음). 이 도구를 내 PC 에서 파일로 열거나(file://), 서버를 https 로 열어 주세요.');
+      if (pageProtocol === 'file:' && !isLoopback(host))
+        warnings.push('이 도구를 파일(file://, HTML 한 파일)로 열었습니다. 브라우저는 파일에서 보내는 요청에 「Origin: null」을 붙이므로, 사내 AI 서버가 그 요청을 허용(CORS)해야 보낼 수 있습니다. 「연결 확인」이 실패하면 IT 에 허용을 요청하거나 반자동(프롬프트 복사 · 붙여 넣기)을 쓰세요.');
       if (scheme === 'http' && str(cfg.apiKey) && !isLocalHost(host))
         warnings.push('키가 암호화되지 않은 http 로 전송됩니다. 사내망 안이라도 https 를 권합니다.');
       if (/api\.openai\.com$/i.test(host)) warnings.push('외부 서비스입니다. 회의 메모(사내 문서)를 보내도 되는지 회사 보안정책을 먼저 확인해 주세요. 이름 가리기를 켜 두세요.');

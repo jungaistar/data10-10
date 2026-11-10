@@ -242,5 +242,20 @@ test('판 맞추기 — index.html ?v= · logic.js · app.js 가 같은 판 (scr
   assert.ok(v.html.length >= 7 && v.html.every(x => x === L.VERSION), 'index.html 의 모든 js·css 에 ?v=' + L.VERSION + ' — ' + JSON.stringify(v.html));
 });
 
+const single = await import('../scripts/build-single.mjs');
+test('HTML 한 파일 — dist 가 지금 소스와 같음(낡지 않음) · 외부 파일 없음 · 같은 판 · 스크립트 끊김 없음', () => {
+  const fs = require('node:fs');
+  const { html, used } = single.buildSingle();
+  assert.ok(fs.existsSync(single.OUT), 'dist 파일 없음 — node scripts/build-single.mjs');
+  assert.ok(fs.readFileSync(single.OUT, 'utf8') === html, 'dist 가 낡았습니다 — node scripts/build-single.mjs (또는 bump-version) 로 다시 만드세요');
+  assert.equal(used.length, 11);   // css 2(style · auth) + vendor/jszip + js 5 + 로그인 키트 3(vendor/supabase.js · js/auth-config.js · js/auth.js)
+  assert.ok(!/<script src=|<link rel="stylesheet"/.test(html), '외부 파일을 부르는 태그가 남음');
+  assert.ok(html.includes("var VERSION = '" + L.VERSION + "'") && html.includes("var APP_VERSION = '" + L.VERSION + "'"), '같은 판');
+  assert.ok(html.includes('window.__SINGLE_FILE__ = true') && html.includes("if(L.protocol==='file:')return;"), '한 파일 표시 · fresh-guard 는 file:// 에서 쉼');
+  assert.ok(!/<\/script(?!>)/i.test(html.replace(/<\/script>/g, '')), '스크립트 안에 끊는 글자 없음');
+  const opens = (html.match(/<script>/g) || []).length, closes = (html.match(/<\/script>/g) || []).length;
+  assert.equal(opens, closes, '<script> 여닫이 수');
+});
+
 await Promise.all(pending);
 console.log('\n' + passed + '개 통과' + (failed ? ' · 실패 ' + failed : ''));

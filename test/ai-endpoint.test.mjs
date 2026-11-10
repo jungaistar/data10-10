@@ -127,5 +127,15 @@ test('생각하는 모델(Qwen3): 호출 전체 — 가짜 서버가 생각 + �
   assert.deepEqual(await E.callModels({ baseUrl: 'http://10.0.0.5:8000/v1' }, { fetch: models }), ['qwen3.8']);
 });
 
+test('HTML 한 파일(file://) — 사내 서버 주소는 CORS(Origin null) 경고, 내 PC(localhost)는 경고 없음, 온라인 페이지에는 이 경고 없음', () => {
+  const corp = E.validateConfig({ baseUrl: 'http://10.0.0.5:8000/v1', model: 'm' }, 'file:');
+  assert.deepEqual(corp.errors, []);
+  assert.ok(corp.warnings.some((w) => w.includes('Origin: null')), JSON.stringify(corp.warnings));
+  assert.ok(E.validateConfig({ baseUrl: 'https://llm.corp.example/v1', model: 'm' }, 'file:').warnings.some((w) => w.includes('CORS')));
+  assert.ok(!E.validateConfig({ baseUrl: 'http://localhost:11434/v1', model: 'm' }, 'file:').warnings.some((w) => w.includes('Origin: null')));
+  assert.ok(!E.validateConfig({ baseUrl: 'https://llm.corp.example/v1', model: 'm' }, 'https:').warnings.some((w) => w.includes('Origin: null')));
+  assert.ok(!E.validateConfig({ baseUrl: 'http://127.0.0.1:8000/v1', model: 'm' }, 'http:').warnings.some((w) => w.includes('Origin: null')));
+});
+
 await Promise.all(pending);
 console.log('\n[AI] ' + passed + '개 통과' + (failed ? ' · 실패 ' + failed : ''));

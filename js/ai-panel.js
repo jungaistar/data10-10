@@ -95,7 +95,7 @@
       h('ul', { class: 'note' },
         h('li', null, 'Qwen3 처럼 「생각하는 모드」가 있는 모델은 답 앞에 <think>…</think> 를 붙여 보낼 수 있습니다. 도구가 그 부분을 떼고 답만 씁니다.'),
         h('li', null, '보내는 곳은 위 주소 하나뿐입니다. 키는 리포·코드에 없고, 「기억」을 끄면 이 창을 닫을 때 사라집니다.'),
-        h('li', null, '브라우저에서 바로 부르므로 서버가 CORS 를 허용해야 합니다. 가장 쉬운 길은 이 도구를 내려받아 index.html 을 더블클릭해 여는 것(file://)입니다 — Ollama 는 그대로 허용하고, LM Studio 는 「Enable CORS」를 켭니다. 온라인 주소(https)에서는 내 PC(localhost) 말고 http 주소를 쓸 수 없습니다.')),
+        h('li', null, '브라우저에서 바로 부르므로 서버가 CORS 를 허용해야 합니다. 가장 쉬운 길은 「설정 → HTML 한 파일로 받기」로 받은 파일을 더블클릭해 여는 것(file://)입니다 — Ollama 는 그대로 허용하고, LM Studio 는 「Enable CORS」를 켭니다. 온라인 주소(https)에서는 내 PC(localhost) 말고 http 주소를 쓸 수 없습니다.')),
       h('div', { class: 'btn-row', style: 'margin-top:10px' },
         h('button', { type: 'button', class: 'btn btn-primary', onclick: saveNow }, '저장'),
         h('button', { type: 'button', class: 'btn', onclick: testNow }, '연결 확인'),
