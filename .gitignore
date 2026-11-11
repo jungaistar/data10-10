@@ -1,0 +1,6 @@
+.DS_Store
+node_modules/
+__pycache__/
+.env
+tools/local-exe/exe-out/
+tools/local-exe/exe-build/
