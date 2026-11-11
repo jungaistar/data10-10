@@ -248,7 +248,7 @@ test('HTML 한 파일 — dist 가 지금 소스와 같음(낡지 않음) · 외
   const { html, used } = single.buildSingle();
   assert.ok(fs.existsSync(single.OUT), 'dist 파일 없음 — node scripts/build-single.mjs');
   assert.ok(fs.readFileSync(single.OUT, 'utf8') === html, 'dist 가 낡았습니다 — node scripts/build-single.mjs (또는 bump-version) 로 다시 만드세요');
-  assert.equal(used.length, 11);   // css 2(style · auth) + vendor/jszip + js 5 + 로그인 키트 3(vendor/supabase.js · js/auth-config.js · js/auth.js)
+  assert.equal(used.length, 13);   // css 2(style · auth) + vendor/jszip + js 5 + 로그인 키트 3(vendor/supabase.js · js/auth-config.js · js/auth.js) + 게시판 2(css/board.css · js/board.js)
   assert.ok(!/<script src=|<link rel="stylesheet"/.test(html), '외부 파일을 부르는 태그가 남음');
   assert.ok(html.includes("var VERSION = '" + L.VERSION + "'") && html.includes("var APP_VERSION = '" + L.VERSION + "'"), '같은 판');
   assert.ok(html.includes('window.__SINGLE_FILE__ = true') && html.includes("if(L.protocol==='file:')return;"), '한 파일 표시 · fresh-guard 는 file:// 에서 쉼');

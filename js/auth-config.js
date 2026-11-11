@@ -8,6 +8,7 @@ window.AUTH_CONFIG = {
   "kakao": true,
   "idleMinutes": 30,
   "localBypass": true,
+  "board": true,
   "site": {
     "title": "AI 기반 회의록 요약 도우미",
     "summary": "회의 직후 메모장 · 워드로 적은 메모와 회의록 서식을 넣으면 결정 사항과 Action Item(할 일 · 담당 · 기한)까지 서식 칸에 맞춰 정리하는 브라우저 도구입니다. 반자동 AI · 로컬 LLM · AI 없는 규칙 초안 중 하나로 정리합니다.",
