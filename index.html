@@ -12,9 +12,16 @@
   <meta property="og:description" content="회의 직후 메모장 · 워드로 적은 메모와 회의록 서식을 넣으면 결정 사항과 Action Item(할 일 · 담당 · 기한)까지 서식 칸에 맞춰 정리하는 브라우저 도구입니다. 반자동 AI · 로컬 LLM · AI 없는 규칙 초안 중 하나로 정리합니다.">
   <meta property="og:url" content="https://data10-10.jobability.co.kr/">
   <meta property="og:image" content="https://data10-10.jobability.co.kr/og-image.png">
+  <meta property="og:image:secure_url" content="https://data10-10.jobability.co.kr/og-image.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AI 기반 회의록 요약 도우미">
+  <meta property="og:locale" content="ko_KR">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI 기반 회의록 요약 도우미">
+  <meta name="twitter:description" content="회의 직후 메모장 · 워드로 적은 메모와 회의록 서식을 넣으면 결정 사항과 Action Item(할 일 · 담당 · 기한)까지 서식 칸에 맞춰 정리하는 브라우저 도구입니다. 반자동 AI · 로컬 LLM · AI 없는 규칙 초안 중 하나로 정리합니다.">
+  <meta name="twitter:image" content="https://data10-10.jobability.co.kr/og-image.png">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <!-- /seo-kit -->
   <meta name="description" content="회의 직후 메모장·워드로 적은 메모와 회의록 서식을 넣으면 결정 사항·Action Item(담당·기한)까지 서식에 맞춰 정리하는 브라우저 도구(data10-10). AI 는 반자동(복사·붙여 넣기)·로컬 LLM·AI 없는 규칙 초안 중에서 고릅니다.">
@@ -30,11 +37,11 @@
        탭 전환·포커스로는 옮기지 않는다(입력 유실). ETag 는 Cloudflare 가 지워서 쓸 수 없다. 원본: dreamit-1000/scripts/fresh-guard/guard.html
        data10-10: file:// 로 열면(사내 PC 의 HTML 한 파일) 아무것도 하지 않는다 — file 주소는 fetch 를 못 해 콘솔 오류만 남기 때문(2026-11-10). -->
   <script>(function(){try{var L=location,P='_fg',h=window.history,q=L.search;if(L.protocol==='file:')return;if(/[?&]_fg=/.test(q)&&h&&h.replaceState){q=q.replace(/([?&])_fg=[^&]*&?/,'$1').replace(/[?&]$/,'');h.replaceState(h.state,'',L.pathname+q+L.hash);}var d=Date.parse(document.lastModified),u=L.pathname+L.search,k='__fresh_guard',t=0;if(!d||!window.fetch||!window.sessionStorage)return;var g=function(s,v){return s+(s.indexOf('?')<0?'?':'&')+P+'='+v;};var c=function(){var n=Date.now();if(n-t<15000)return;t=n;fetch(g(u,n),{method:'HEAD',cache:'no-store'}).then(function(r){var lm=r.headers.get('last-modified'),f=lm&&Date.parse(lm);if(!f||f<=d+1000)return;if(sessionStorage.getItem(k)===lm)return;sessionStorage.setItem(k,lm);L.replace(g(L.pathname+L.search,f)+L.hash);})['catch'](function(){});};c();var p=h&&h.pushState;if(p)h.pushState=function(){var x=p.apply(this,arguments);c();return x;};addEventListener('hashchange',c);addEventListener('popstate',c);}catch(e){}})();</script>
-  <link rel="stylesheet" href="css/style.css?v=2026-11-11.7">
+  <link rel="stylesheet" href="css/style.css?v=2026-11-11.8">
   <!-- auth-kit: 로그인 전에는 도구 화면을 감춘다(js/auth.js 가 판정 뒤 푼다) -->
   <script>document.documentElement.classList.add('auth-lock')</script>
-  <link rel="stylesheet" href="css/auth.css?v=2026-11-11.7">
-  <link rel="stylesheet" href="css/board.css?v=2026-11-11.7">
+  <link rel="stylesheet" href="css/auth.css?v=2026-11-11.8">
+  <link rel="stylesheet" href="css/board.css?v=2026-11-11.8">
   <!-- /auth-kit -->
 </head>
 <body>
@@ -67,17 +74,17 @@
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
   <!-- 로컬 파일(file://)로 열어도 돌도록 module 이 아닌 일반 스크립트로 불러옵니다. 외부 CDN 을 부르지 않습니다 -->
-  <script src="vendor/jszip.min.js?v=2026-11-11.7"></script>
-  <script src="js/logic.js?v=2026-11-11.7"></script>
-  <script src="js/samples.js?v=2026-11-11.7"></script>
-  <script src="js/ai-endpoint.js?v=2026-11-11.7"></script>
-  <script src="js/ai-panel.js?v=2026-11-11.7"></script>
-  <script src="js/app.js?v=2026-11-11.7"></script>
+  <script src="vendor/jszip.min.js?v=2026-11-11.8"></script>
+  <script src="js/logic.js?v=2026-11-11.8"></script>
+  <script src="js/samples.js?v=2026-11-11.8"></script>
+  <script src="js/ai-endpoint.js?v=2026-11-11.8"></script>
+  <script src="js/ai-panel.js?v=2026-11-11.8"></script>
+  <script src="js/app.js?v=2026-11-11.8"></script>
   <!-- auth-kit: 로그인 · 사용 신청 · 승인(정본 data10-00/kit/auth) -->
-  <script src="vendor/supabase.js?v=2026-11-11.7"></script>
-  <script src="js/auth-config.js?v=2026-11-11.7"></script>
-  <script src="js/board.js?v=2026-11-11.7"></script>
-  <script src="js/auth.js?v=2026-11-11.7"></script>
+  <script src="vendor/supabase.js?v=2026-11-11.8"></script>
+  <script src="js/auth-config.js?v=2026-11-11.8"></script>
+  <script src="js/board.js?v=2026-11-11.8"></script>
+  <script src="js/auth.js?v=2026-11-11.8"></script>
   <!-- /auth-kit -->
 </body>
 </html>
